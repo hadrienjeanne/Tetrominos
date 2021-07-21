@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://src/scenes/blocks/Block.tscn" type="PackedScene" id=1]
+[ext_resource path="res://src/scenes/blocks/I_Block.gd" type="Script" id=2]
+
+[node name="I_Block" instance=ExtResource( 1 )]
+script = ExtResource( 2 )
+
+[node name="Cell2" parent="." index="1"]
+position = Vector2( 0, 64 )
+
+[node name="Cell3" parent="." index="2"]
+position = Vector2( 0, 128 )
+
+[node name="Cell4" parent="." index="3"]
+position = Vector2( 0, 192 )
