@@ -6,4 +6,3 @@
 
 [node name="Board" parent="." instance=ExtResource( 1 )]
 position = Vector2( 220, 320 )
-speed = null

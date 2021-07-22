@@ -2,6 +2,7 @@ extends Node2D
 
 onready var sprite : Sprite = $Sprite
 onready var move_tween : Tween = $MoveTween
+onready var destroy_animation : AnimatedSprite = $DestroyAnimation
 
 var available_colors := {
 	"blue": "res://src/assets/Cells/size_256/Cell_blue_256.png",
@@ -32,6 +33,12 @@ func choose_color(c: String) -> void:
 		sprite.texture = available_colors[c]
 	
 func move(target : Vector2) -> void:
-	# print_debug("move tween", position, " ", target)
-	var _err = move_tween.interpolate_property(self, "position", position, target, 0.2, Tween.TRANS_BOUNCE, Tween.EASE_OUT)
+	print_debug("move cell", position, " -> ", target)
+	var _err = move_tween.interpolate_property(self, "position", position, position+target, 0.2, Tween.TRANS_BOUNCE, Tween.EASE_OUT)
 	_err = move_tween.start()
+
+func destroy() -> void:
+	destroy_animation.visible = true
+	destroy_animation.play("default")
+	yield(destroy_animation, "animation_finished")
+	queue_free()

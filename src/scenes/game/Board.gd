@@ -43,9 +43,18 @@ func instance_next_block() -> void:
 	current_block_position = pixel_to_grid(block.position.x, block.position.y)
 	put_block_into_board(int(current_block_position.y), int(current_block_position.x))
 
-## make current block fall down 1 cell
-func block_fall() -> void:
+## make current block fall down 1 cell and move the cells on the board than can go down
+func blocks_fall() -> void:
 	move_current_block(Vector2.DOWN)
+	
+	for row in range(height - 2, 1, -1):
+		for col in width:
+			if is_a_cell(row, col) and board[row+1][col] == null:
+				var cell = board[row][col]
+				cell.move(Vector2.DOWN * Params.cell_size)
+				board[row+1][col] = cell
+				board[row][col] = null
+
 
 func move_current_block(direction: Vector2) -> void:
 	if can_move(direction):
@@ -55,6 +64,7 @@ func move_current_block(direction: Vector2) -> void:
 		if not can_move(Vector2.DOWN):			
 			fix_block_on_board()
 			check_for_color_matches()
+			destroy_matched_cells()
 			instance_next_block()
 
 func rotate_current_block() -> void:
@@ -76,7 +86,7 @@ func input_treatment() -> void:
 		display_board()
 
 func _on_FallTimer_timeout() -> void:
-	block_fall()
+	blocks_fall()
 
 ## create a 2D array of size (w, h)
 func make_2d_array(w: int, h: int) -> Array:
@@ -127,7 +137,6 @@ func can_move(direction: Vector2) -> bool:
 				if current_block_position.x + j + direction.x < 0 or current_block_position.x + j + direction.x >= width:
 					return false
 				if is_a_cell(current_block_position.y + i + direction.y, current_block_position.x + j + direction.x): # touching other pieces on the board but not the current block itself
-				#if board[current_block_position.y + i + direction.y][current_block_position.x + j + direction.x] != null and not board[current_block_position.y + i + direction.y][current_block_position.x + j + direction.x] in [1, 2, 3, 4]: # touching other pieces on the board but not the current block itself
 					return false
 	return true
 
@@ -152,9 +161,6 @@ func update_board() -> void:
 
 ## tells whether the position of the block is correct on the board after a rotation clockwise
 func is_position_correct_after_rotation() -> bool:
-	#var test_block = current_block.duplicate()
-	#var test_block_pos = current_block_position
-	#remove_current_block_from_board()
 	current_block.rotate_clockwise()
 	var block_pos = current_block.current_position
 	for i in current_block.positions[block_pos].size():
@@ -168,22 +174,10 @@ func is_position_correct_after_rotation() -> bool:
 					current_block.rotate_counter_clockwise()
 					return false
 				if is_a_cell(current_block_position.y + i, current_block_position.x + j): # touching other pieces on the board but not the current block itself
-				#if board[current_block_position.y + i][current_block_position.x + j] != null and not board[current_block_position.y + i][current_block_position.x + j] in [1, 2, 3, 4]: # touching other pieces on the board but not the current block itself
 					current_block.rotate_counter_clockwise()
 					return false
 	current_block.rotate_counter_clockwise()
 	return true
-
-# func can_move_down() -> bool:
-# 	var block_pos = current_block.current_position
-# 	for row in current_block.positions[block_pos].size():
-# 		for col in current_block.positions[block_pos][row].size():
-# 			var cell = current_block.positions[block_pos][row][col]
-# 			if cell != 0:				
-# 				# if current_block_position.y + row + 1 > height - 1 or board[current_block_position.y + row + 1][current_block_position.x + col] != null and board[current_block_position.y + row + 1][current_block_position.x + col] != 1 and board[current_block_position.y + row + 1][current_block_position.x + col] != 2 and board[current_block_position.y + row + 1][current_block_position.x + col] != 3 and board[current_block_position.y + row + 1][current_block_position.x + col] != 4:
-# 				if current_block_position.y + row + 1 > height - 1 or (board[current_block_position.y + row + 1][current_block_position.x + col] != null and not board[current_block_position.y + row + 1][current_block_position.x + col] in [1, 2, 3, 4]): # touching other pieces on the board but not the current block itself
-# 					return false
-# 	return true
 
 ## Fixes the current block cells in the board
 func fix_block_on_board() -> void:
@@ -208,10 +202,6 @@ func check_for_color_matches() -> void:
 						cell_above.matched = true
 						cell.matched = true
 						cell_below.matched = true
-						cell_above.sprite.modulate = Color(1, 1, 1, 0.5)
-						cell.sprite.modulate = Color(1, 1, 1, 0.5)
-						cell_below.sprite.modulate = Color(1, 1, 1, 0.5)
-						print_debug("vertical match!")		
 
 			if col > 0 and col < width -1:
 				if is_a_cell(row, col-1) and is_a_cell(row, col) and is_a_cell(row, col+1):				
@@ -222,13 +212,17 @@ func check_for_color_matches() -> void:
 						cell_left.matched = true
 						cell.matched = true
 						cell_right.matched = true
-						cell_left.sprite.modulate = Color(1, 1, 1, 0.5)
-						cell.sprite.modulate = Color(1, 1, 1, 0.5)
-						cell_right.sprite.modulate = Color(1, 1, 1, 0.5)
-						print_debug("horizontal match!")
-				
 			
-
+func destroy_matched_cells() -> void:
+	for row in height:
+		for col in width:
+			if is_a_cell(row, col):
+				var cell = board[row][col]
+				if cell.matched:
+					cell.destroy()
+					# yield(cell.destroy_animation, "animation_finished")
+					# todo faire plutot un effet qu'une animation, ou instancier l'animation plutôt que l'avoir comme child de la cellule
+					board[row][col] = null
 
 func is_a_cell(row, col) -> bool:
 	return board[row][col] != null and not board[row][col] in [1, 2, 3, 4]
