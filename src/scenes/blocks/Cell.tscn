@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://src/assets/Cells/size_256/Cell_blue_256.png" type="Texture" id=1]
 [ext_resource path="res://src/scenes/blocks/Cell.gd" type="Script" id=2]
@@ -9,6 +9,7 @@
 [ext_resource path="res://src/assets/Effects/explode_5_1.png" type="Texture" id=7]
 [ext_resource path="res://src/assets/Effects/explode_6_1.png" type="Texture" id=8]
 [ext_resource path="res://src/assets/Effects/explode_7_1.png" type="Texture" id=9]
+[ext_resource path="res://src/assets/Cells/size_256/Cell_empty_256.png" type="Texture" id=10]
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
@@ -32,4 +33,10 @@ centered = false
 visible = false
 scale = Vector2( 0.5, 0.5 )
 frames = SubResource( 1 )
+centered = false
+
+[node name="ProjectionSprite" type="Sprite" parent="."]
+position = Vector2( 0, 64 )
+scale = Vector2( 0.25, 0.25 )
+texture = ExtResource( 10 )
 centered = false

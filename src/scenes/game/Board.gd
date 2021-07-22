@@ -4,7 +4,7 @@ onready var fall_timer : Timer = $FallTimer
 
 const width := 10
 const height := 20
-export var speed := 1.0
+export var speed := 1.5
 
 var rng := RandomNumberGenerator.new()
 
@@ -26,15 +26,16 @@ var board := []
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	board = make_2d_array(height, width)
+	fall_timer.wait_time = 1 / speed
 	rng.randomize()
-	instance_next_block()
+	instantiate_next_block()
 
 func _process(_delta: float) -> void:
 	input_treatment()
 	
 
 ## instantiate a random block
-func instance_next_block() -> void:
+func instantiate_next_block() -> void:
 	var block = blocks[rng.randi() % blocks.size()].instance()
 	add_child(block)
 	block.position = Vector2(Params.cell_size * 5, 0)
@@ -42,6 +43,7 @@ func instance_next_block() -> void:
 	current_block = block
 	current_block_position = pixel_to_grid(block.position.x, block.position.y)
 	put_block_into_board(int(current_block_position.y), int(current_block_position.x))
+	display_block_projection()
 
 ## make current block fall down 1 cell and move the cells on the board than can go down
 func blocks_fall() -> void:
@@ -65,7 +67,7 @@ func move_current_block(direction: Vector2) -> void:
 			fix_block_on_board()
 			check_for_color_matches()
 			destroy_matched_cells()
-			instance_next_block()
+			instantiate_next_block()
 
 func rotate_current_block() -> void:
 	if is_position_correct_after_rotation():
@@ -152,14 +154,15 @@ func put_block_into_board(row: int, col: int) -> void:
 				board[row + i][col + j] = cell
 
 func remove_current_block_from_board() -> void:
-	for row in board.size():
-		for col in board[row].size():
+	for row in height:
+		for col in width:
 			if board[row][col] in [1, 2, 3, 4]:
 				board[row][col] = null
 
 func update_board() -> void:
 	remove_current_block_from_board()
 	put_block_into_board(int(current_block_position.y), int(current_block_position.x))
+	display_block_projection()
 
 ## tells whether the position of the block is correct on the board after a rotation clockwise
 func is_position_correct_after_rotation() -> bool:
@@ -183,6 +186,12 @@ func is_position_correct_after_rotation() -> bool:
 
 ## Fixes the current block cells in the board
 func fix_block_on_board() -> void:
+	# removes projections
+	current_block.cell1.projection_sprite.visible = false
+	current_block.cell2.projection_sprite.visible = false
+	current_block.cell3.projection_sprite.visible = false
+	current_block.cell4.projection_sprite.visible = false
+
 	for row in height:
 		for col in width:
 			match board[row][col]:
@@ -237,3 +246,15 @@ func get_lowest_available_row(col: int) -> int:
 		if not is_a_cell(row, col):
 			return row
 	return 0
+
+## displays the projection of the current block on the lower part of the board
+func display_block_projection() -> void:
+	for row in height:
+		for col in width:
+			if board[row][col] in [1, 2, 3, 4]:
+				var lowest_row = get_lowest_available_row(col)				
+				match board[row][col]:
+					1: current_block.cell1.set_projection_at_row(row, col, lowest_row)
+					2: current_block.cell2.set_projection_at_row(row, col, lowest_row)
+					3: current_block.cell3.set_projection_at_row(row, col, lowest_row)
+					4: current_block.cell4.set_projection_at_row(row, col, lowest_row)
