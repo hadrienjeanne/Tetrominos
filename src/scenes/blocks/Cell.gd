@@ -32,13 +32,14 @@ func choose_color(c: String) -> void:
 		color = c
 		sprite.texture = available_colors[c]
 	
-func move(target : Vector2) -> void:
-	print_debug("move cell", position, " -> ", target)
-	var _err = move_tween.interpolate_property(self, "position", position, position+target, 0.2, Tween.TRANS_BOUNCE, Tween.EASE_OUT)
+func move(dir : Vector2) -> void:
+	# print_debug("move cell", position, " -> ", target)
+	var _err = move_tween.interpolate_property(self, "position", position, position+dir, 0.2, Tween.TRANS_BOUNCE, Tween.EASE_OUT)
 	_err = move_tween.start()
 
 func destroy() -> void:
 	destroy_animation.visible = true
+	sprite.visible = false
 	destroy_animation.play("default")
 	yield(destroy_animation, "animation_finished")
 	queue_free()

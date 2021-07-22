@@ -87,6 +87,8 @@ func input_treatment() -> void:
 
 func _on_FallTimer_timeout() -> void:
 	blocks_fall()
+	check_for_color_matches()
+	destroy_matched_cells()
 
 ## create a 2D array of size (w, h)
 func make_2d_array(w: int, h: int) -> Array:
@@ -213,6 +215,7 @@ func check_for_color_matches() -> void:
 						cell.matched = true
 						cell_right.matched = true
 			
+## destroys the cells that are matched (Cell attribute matched == true)
 func destroy_matched_cells() -> void:
 	for row in height:
 		for col in width:
@@ -224,5 +227,13 @@ func destroy_matched_cells() -> void:
 					# todo faire plutot un effet qu'une animation, ou instancier l'animation plutôt que l'avoir comme child de la cellule
 					board[row][col] = null
 
+## returns true if the item at the position (row, col) in the board is a cell (i.e. is not null and not the current block)
 func is_a_cell(row, col) -> bool:
 	return board[row][col] != null and not board[row][col] in [1, 2, 3, 4]
+
+## returns the first available row at the col column of the board
+func get_lowest_available_row(col: int) -> int:
+	for row in range(height-1, 1, -1):
+		if not is_a_cell(row, col):
+			return row
+	return 0
