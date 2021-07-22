@@ -34,7 +34,7 @@ func choose_color(c: String) -> void:
 		sprite.texture = available_colors[c]
 	
 func move(dir : Vector2) -> void:
-	# print_debug("move cell", position, " -> ", target)
+	# print_debug("move cell", position, " -> ", dir)
 	var _err = move_tween.interpolate_property(self, "position", position, position+dir, 0.2, Tween.TRANS_BOUNCE, Tween.EASE_OUT)
 	_err = move_tween.start()
 

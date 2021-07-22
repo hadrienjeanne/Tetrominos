@@ -84,8 +84,8 @@ func input_treatment() -> void:
 	if Input.is_action_just_pressed("ui_down"):
 		move_current_block(Vector2.DOWN)
 	if Input.is_action_just_pressed("ui_complete_down"):
-		print_debug("fall completely downwards")
-		display_board()
+		fall_to_bottom()
+		# display_board()
 
 func _on_FallTimer_timeout() -> void:
 	blocks_fall()
@@ -232,8 +232,6 @@ func destroy_matched_cells() -> void:
 				var cell = board[row][col]
 				if cell.matched:
 					cell.destroy()
-					# yield(cell.destroy_animation, "animation_finished")
-					# todo faire plutot un effet qu'une animation, ou instancier l'animation plutôt que l'avoir comme child de la cellule
 					board[row][col] = null
 
 ## returns true if the item at the position (row, col) in the board is a cell (i.e. is not null and not the current block)
@@ -258,3 +256,17 @@ func display_block_projection() -> void:
 					2: current_block.cell2.set_projection_at_row(row, col, lowest_row)
 					3: current_block.cell3.set_projection_at_row(row, col, lowest_row)
 					4: current_block.cell4.set_projection_at_row(row, col, lowest_row)
+
+## makes the current block fall downard to bottom of the board
+func fall_to_bottom() -> void:
+	fall_timer.stop()
+	var highest_row = height
+	for row in height:
+		for col in width:
+			if board[row][col] in [1, 2, 3, 4]:
+				var lowest_row = get_lowest_available_row(col)
+				if lowest_row < highest_row:
+					highest_row = lowest_row
+	move_current_block(Vector2.DOWN * (highest_row - current_block_position.y - current_block.positions[0].size())) # TODO modifier -2 par la hauteur de la pièce
+	# todo gérer le fait que lorsqu'on appui proche d'une pièce, le bloc remonte
+	fall_timer.start()
