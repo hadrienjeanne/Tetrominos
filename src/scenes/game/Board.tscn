@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://src/scenes/game/Board.gd" type="Script" id=1]
+[ext_resource path="res://src/assets/Cells/size_256/Cell_empty_256.png" type="Texture" id=2]
 
 [node name="Board" type="Node2D"]
 script = ExtResource( 1 )
@@ -20,5 +21,27 @@ color = Color( 0, 0, 0, 1 )
 
 [node name="FallTimer" type="Timer" parent="."]
 autostart = true
+
+[node name="Projections" type="Node2D" parent="."]
+
+[node name="ProjectionCell1" type="Sprite" parent="Projections"]
+scale = Vector2( 0.25, 0.25 )
+texture = ExtResource( 2 )
+centered = false
+
+[node name="ProjectionCell2" type="Sprite" parent="Projections"]
+scale = Vector2( 0.25, 0.25 )
+texture = ExtResource( 2 )
+centered = false
+
+[node name="ProjectionCell3" type="Sprite" parent="Projections"]
+scale = Vector2( 0.25, 0.25 )
+texture = ExtResource( 2 )
+centered = false
+
+[node name="ProjectionCell4" type="Sprite" parent="Projections"]
+scale = Vector2( 0.25, 0.25 )
+texture = ExtResource( 2 )
+centered = false
 
 [connection signal="timeout" from="FallTimer" to="." method="_on_FallTimer_timeout"]

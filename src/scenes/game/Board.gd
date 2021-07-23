@@ -1,6 +1,10 @@
 extends Node2D
 
 onready var fall_timer : Timer = $FallTimer
+onready var projection_cell1 : Sprite = $Projections/ProjectionCell1
+onready var projection_cell2 : Sprite = $Projections/ProjectionCell2
+onready var projection_cell3 : Sprite = $Projections/ProjectionCell3
+onready var projection_cell4 : Sprite = $Projections/ProjectionCell4
 
 const width := 10
 const height := 20
@@ -186,12 +190,6 @@ func is_position_correct_after_rotation() -> bool:
 
 ## Fixes the current block cells in the board
 func fix_block_on_board() -> void:
-	# removes projections
-	current_block.cell1.projection_sprite.visible = false
-	current_block.cell2.projection_sprite.visible = false
-	current_block.cell3.projection_sprite.visible = false
-	current_block.cell4.projection_sprite.visible = false
-
 	for row in height:
 		for col in width:
 			match board[row][col]:
@@ -252,10 +250,10 @@ func display_block_projection() -> void:
 			if board[row][col] in [1, 2, 3, 4]:
 				var lowest_row = get_lowest_available_row(col)				
 				match board[row][col]:
-					1: current_block.cell1.set_projection_at_row(row, col, lowest_row)
-					2: current_block.cell2.set_projection_at_row(row, col, lowest_row)
-					3: current_block.cell3.set_projection_at_row(row, col, lowest_row)
-					4: current_block.cell4.set_projection_at_row(row, col, lowest_row)
+					1: projection_cell1.position = Vector2(col, lowest_row) * Params.cell_size
+					2: projection_cell2.position = Vector2(col, lowest_row) * Params.cell_size
+					3: projection_cell3.position = Vector2(col, lowest_row) * Params.cell_size
+					4: projection_cell4.position = Vector2(col, lowest_row) * Params.cell_size
 
 ## makes the current block fall downard to bottom of the board
 func fall_to_bottom() -> void:
