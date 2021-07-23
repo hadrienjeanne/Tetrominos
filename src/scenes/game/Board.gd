@@ -1,5 +1,6 @@
 extends Node2D
 
+onready var board_rect : AspectRatioContainer = $AspectRatioContainer
 onready var fall_timer : Timer = $FallTimer
 onready var projection_cell1 : Sprite = $Projections/ProjectionCell1
 onready var projection_cell2 : Sprite = $Projections/ProjectionCell2
@@ -7,7 +8,7 @@ onready var projection_cell3 : Sprite = $Projections/ProjectionCell3
 onready var projection_cell4 : Sprite = $Projections/ProjectionCell4
 
 const width := 10
-const height := 20
+const height := 16
 export var speed := 1.5
 
 var rng := RandomNumberGenerator.new()
@@ -32,6 +33,8 @@ func _ready() -> void:
 	board = make_2d_array(height, width)
 	fall_timer.wait_time = 1 / speed
 	rng.randomize()
+	board_rect.ratio = float(width)/height
+	board_rect.rect_size = Vector2(width, height) * Params.cell_size
 	instantiate_next_block()
 
 func _process(_delta: float) -> void:
@@ -198,29 +201,33 @@ func fix_block_on_board() -> void:
 				3: board[row][col] = current_block.cell3
 				4: board[row][col] = current_block.cell4
 
-## checks for 3-matches of the same color # todo match-4 pour coller au côté tetrominoes ?
+## checks for 4-matches of the same color
 func check_for_color_matches() -> void:
 	for row in height:
 		for col in width:
-			if row > 0 and row < height-1:
-				if is_a_cell(row-1, col) and is_a_cell(row, col) and is_a_cell(row+1, col):				
-					var cell_above = board[row-1][col]
-					var cell = board[row][col]
-					var cell_below = board[row+1][col]
-					if cell_above.color == cell.color and cell.color == cell_below.color:
-						cell_above.matched = true
-						cell.matched = true
-						cell_below.matched = true
+			if row >= 0 and row < height-3:
+				if is_a_cell(row, col) and is_a_cell(row+1, col) and is_a_cell(row+2, col) and is_a_cell(row+3, col):
+					var cell_0 = board[row][col]
+					var cell_1 = board[row+1][col]
+					var cell_2 = board[row+2][col]
+					var cell_3 = board[row+3][col]
+					if cell_0.color == cell_1.color and cell_0.color == cell_2.color and cell_0.color == cell_3.color:
+						cell_0.matched = true
+						cell_1.matched = true
+						cell_2.matched = true
+						cell_3.matched = true
 
-			if col > 0 and col < width -1:
-				if is_a_cell(row, col-1) and is_a_cell(row, col) and is_a_cell(row, col+1):				
-					var cell_left = board[row][col-1]
-					var cell = board[row][col]
-					var cell_right = board[row][col+1]
-					if cell_left.color == cell.color and cell.color == cell_right.color:
-						cell_left.matched = true
-						cell.matched = true
-						cell_right.matched = true
+			if col >= 0 and col < width-3:
+				if is_a_cell(row, col) and is_a_cell(row, col+1) and is_a_cell(row, col+2) and is_a_cell(row, col+3):
+					var cell_0 = board[row][col]
+					var cell_1 = board[row][col+1]
+					var cell_2 = board[row][col+2]
+					var cell_3 = board[row][col+3]
+					if cell_0.color == cell_1.color and cell_0.color == cell_2.color and cell_0.color == cell_3.color:
+						cell_0.matched = true
+						cell_1.matched = true
+						cell_2.matched = true
+						cell_3.matched = true
 			
 ## destroys the cells that are matched (Cell attribute matched == true)
 func destroy_matched_cells() -> void:
@@ -257,7 +264,7 @@ func display_block_projection() -> void:
 
 ## makes the current block fall downard to bottom of the board
 func fall_to_bottom() -> void:
-	fall_timer.stop()
+	# fall_timer.stop()
 	var highest_row = height
 	for row in height:
 		for col in width:
@@ -265,6 +272,6 @@ func fall_to_bottom() -> void:
 				var lowest_row = get_lowest_available_row(col)
 				if lowest_row < highest_row:
 					highest_row = lowest_row
-	move_current_block(Vector2.DOWN * (highest_row - current_block_position.y - current_block.positions[0].size())) # TODO modifier -2 par la hauteur de la pièce
+	move_current_block(Vector2.DOWN * (highest_row - current_block_position.y - current_block.get_height())) # TODO modifier -2 par la hauteur de la pièce
 	# todo gérer le fait que lorsqu'on appui proche d'une pièce, le bloc remonte
-	fall_timer.start()
+	# fall_timer.start()

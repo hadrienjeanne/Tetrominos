@@ -10,7 +10,6 @@ onready var cell4 : = $Cell4
 enum {POS1, POS2, POS3, POS4}
 var positions := []
 var current_position := POS1
-var vertical_offset := 0
 
 # var block_top := 0
 # var block_bottom := 0
@@ -50,3 +49,14 @@ func set_in_position(pos: int) -> void:
 				2: cell2.position = Vector2(j, i) * cell_size
 				3: cell3.position = Vector2(j, i) * cell_size
 				4: cell4.position = Vector2(j, i) * cell_size
+
+func get_height() -> int:
+	var height := 0
+	for row in positions[current_position]:
+		var has_cell_in_row := false
+		for col in row:
+			if col != 0:
+				has_cell_in_row = true
+		if has_cell_in_row:
+			height += 1
+	return height

@@ -9,7 +9,6 @@ func _ready() -> void:
 		[[4, 0, 0], [3, 2, 0], [0, 1, 0]],
 	]
 	set_in_position(POS1)
-	vertical_offset = 1
 
 func move(target : Vector2) -> void:
 	.move(target)
