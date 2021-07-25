@@ -12,6 +12,7 @@ var available_colors := {
 	"yellow": "res://src/assets/Cells/size_256/Cell_yellow_256.png",
 }
 
+var score := 5
 var color : String
 var matched := false
 

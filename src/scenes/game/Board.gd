@@ -9,6 +9,7 @@ onready var projection_cell4 : Sprite = $Projections/ProjectionCell4
 
 const width := 10
 const height := 16
+var board := []
 export var speed := 1.5
 
 var rng := RandomNumberGenerator.new()
@@ -26,7 +27,11 @@ var blocks := [
 var current_block
 var current_block_position := Vector2.ZERO
 
-var board := []
+var score := 0
+var streak := 1
+
+signal score_updated(value)
+signal game_over
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -52,6 +57,15 @@ func instantiate_next_block() -> void:
 	put_block_into_board(int(current_block_position.y), int(current_block_position.x))
 	display_block_projection()
 
+	var is_blocked_at_spawn := false
+	for d in [Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]:
+		if not can_move(d):
+			is_blocked_at_spawn = true
+
+	if is_blocked_at_spawn :
+		emit_signal("game_over")
+
+
 ## make current block fall down 1 cell and move the cells on the board than can go down
 func blocks_fall() -> void:
 	move_current_block(Vector2.DOWN)
@@ -74,7 +88,7 @@ func move_current_block(direction: Vector2) -> void:
 			fix_block_on_board()
 			check_for_color_matches()
 			destroy_matched_cells()
-			instantiate_next_block()
+			instantiate_next_block()	
 
 func rotate_current_block() -> void:
 	if is_position_correct_after_rotation():
@@ -229,13 +243,15 @@ func check_for_color_matches() -> void:
 						cell_2.matched = true
 						cell_3.matched = true
 			
-## destroys the cells that are matched (Cell attribute matched == true)
+## destroys the cells that are matched (Cell attribute matched == true) and updates the score
 func destroy_matched_cells() -> void:
 	for row in height:
 		for col in width:
 			if is_a_cell(row, col):
 				var cell = board[row][col]
 				if cell.matched:
+					score += cell.score * streak # todo faire un effet où le score apparaît sur le board à l'endroit du match et disparaît
+					emit_signal("score_updated", score)
 					cell.destroy()
 					board[row][col] = null
 

@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://src/scenes/menu/MainMenuPanel.tscn" type="PackedScene" id=1]
+[ext_resource path="res://src/scenes/menu/MainMenu.gd" type="Script" id=2]
+[ext_resource path="res://src/scenes/menu/SettingsMenuPanel.tscn" type="PackedScene" id=3]
+
+[node name="MainMenu" type="Node2D"]
+script = ExtResource( 2 )
+
+[node name="MainMenuPanel" parent="." instance=ExtResource( 1 )]
+offset = Vector2( 1080, 0 )
+transform = Transform2D( 1, 0, 0, 1, 1080, 0 )
+
+[node name="SettingsMenuPanel" parent="." instance=ExtResource( 3 )]
+offset = Vector2( 1080, 0 )
+transform = Transform2D( 1, 0, 0, 1, 1080, 0 )
+
+[connection signal="play_pressed" from="MainMenuPanel" to="." method="_on_MainMenuPanel_play_pressed"]
+[connection signal="settings_pressed" from="MainMenuPanel" to="." method="_on_MainMenuPanel_settings_pressed"]
+[connection signal="settings_back_pressed" from="SettingsMenuPanel" to="." method="_on_SettingsMenuPanel_settings_back_pressed"]
+[connection signal="settings_sound_pressed" from="SettingsMenuPanel" to="." method="_on_SettingsMenuPanel_settings_sound_pressed"]
