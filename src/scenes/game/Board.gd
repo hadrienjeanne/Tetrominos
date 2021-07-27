@@ -108,6 +108,15 @@ func input_treatment() -> void:
 		fall_to_bottom()
 		# display_board()
 
+## on down button pression, make the current block fall down
+func _on_DownButton_pressed() -> void:
+	fall_to_bottom()
+
+## on rotate button pression make the current block rotate
+func _on_RotateButton_pressed() -> void:
+	rotate_current_block()
+
+## on falltimer timeout, make all blocks fall down 1 row and check for matches
 func _on_FallTimer_timeout() -> void:
 	blocks_fall()
 	check_for_color_matches()
