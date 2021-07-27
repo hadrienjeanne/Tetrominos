@@ -27,6 +27,7 @@ config/icon="res://icon.png"
 [autoload]
 
 Params="*res://src/scenes/game/Params.tscn"
+Player="*res://src/scenes/game/Player.tscn"
 
 [display]
 

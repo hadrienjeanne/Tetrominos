@@ -31,7 +31,7 @@ func change_color() -> void:
 func choose_color(c: String) -> void:
 	if c in available_colors.keys():
 		color = c
-		sprite.texture = available_colors[c]
+		sprite.set_texture(load(available_colors[c]))
 	
 func move(dir : Vector2) -> void:
 	# print_debug("move cell", position, " -> ", dir)

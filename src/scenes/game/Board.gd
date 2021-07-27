@@ -7,8 +7,8 @@ onready var projection_cell2 : Sprite = $Projections/ProjectionCell2
 onready var projection_cell3 : Sprite = $Projections/ProjectionCell3
 onready var projection_cell4 : Sprite = $Projections/ProjectionCell4
 
-const width := 10
-const height := 16
+var width := 10
+var height := 16
 var board := []
 export var speed := 1.5
 
@@ -24,18 +24,23 @@ var blocks := [
 	preload("res://src/scenes/blocks/Z_Block.tscn")
 ]
 
+var cell_scene := preload("res://src/scenes/blocks/Cell.tscn")
+
 var current_block
 var current_block_position := Vector2.ZERO
 
 var score := 0
 var streak := 1
 
+var level := preload("res://src/scenes/levels/LevelTemplate.tscn")
+
 signal score_updated(value)
 signal game_over
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	board = make_2d_array(height, width)
+	load_level(level)
+
 	fall_timer.wait_time = 1 / speed
 	rng.randomize()
 	board_rect.ratio = float(width)/height
@@ -84,7 +89,7 @@ func move_current_block(direction: Vector2) -> void:
 		current_block.move(current_block_position * Params.cell_size + direction * Params.cell_size)
 		current_block_position += direction
 		update_board()
-		if not can_move(Vector2.DOWN):			
+		if not can_move(Vector2.DOWN):
 			fix_block_on_board()
 			check_for_color_matches()
 			destroy_matched_cells()
@@ -119,6 +124,7 @@ func _on_RotateButton_pressed() -> void:
 ## on falltimer timeout, make all blocks fall down 1 row and check for matches
 func _on_FallTimer_timeout() -> void:
 	blocks_fall()
+	# if not can_move(Vector2.DOWN): # todo vérifier que les blocs ne peuvent plus descendre avant de faire les matches
 	check_for_color_matches()
 	destroy_matched_cells()
 
@@ -300,3 +306,23 @@ func fall_to_bottom() -> void:
 	move_current_block(Vector2.DOWN * (highest_row - current_block_position.y - current_block.get_height())) # TODO modifier -2 par la hauteur de la pièce
 	# todo gérer le fait que lorsqu'on appui proche d'une pièce, le bloc remonte
 	# fall_timer.start()
+
+func load_level(_level: PackedScene) -> void:
+	var lv := _level.instance()
+	height = lv.level_height
+	width = lv.level_width
+	board = make_2d_array(height, width)
+
+	var tm : TileMap = lv.get_node("TileMap")
+	for pos in tm.get_used_cells():
+		var new_cell = cell_scene.instance()
+		add_child(new_cell)
+		board[pos.y][pos.x] = new_cell
+		new_cell.position = pos * Params.cell_size
+		match tm.get_cellv(pos):
+			0: board[pos.y][pos.x].choose_color("yellow")
+			1: board[pos.y][pos.x].choose_color("blue")
+			2: board[pos.y][pos.x].choose_color("brown")
+			3: board[pos.y][pos.x].choose_color("green")
+			4: board[pos.y][pos.x].choose_color("red")
+		
