@@ -12,7 +12,6 @@ var height := 16
 var board := []
 export var speed := 1.5
 
-var rng := RandomNumberGenerator.new()
 
 var blocks := [
 	preload("res://src/scenes/blocks/I_Block.tscn"),
@@ -42,7 +41,6 @@ func _ready() -> void:
 	load_level(level)
 
 	fall_timer.wait_time = 1 / speed
-	rng.randomize()
 	board_rect.ratio = float(width)/height
 	board_rect.rect_size = Vector2(width, height) * Params.cell_size
 	instantiate_next_block()
@@ -53,7 +51,7 @@ func _process(_delta: float) -> void:
 
 ## instantiate a random block
 func instantiate_next_block() -> void:
-	var block = blocks[rng.randi() % blocks.size()].instance()
+	var block = blocks[Params.rng.randi() % blocks.size()].instance()
 	add_child(block)
 	block.position = Vector2(Params.cell_size * 5, 0)
 
@@ -307,12 +305,20 @@ func fall_to_bottom() -> void:
 	# todo gérer le fait que lorsqu'on appui proche d'une pièce, le bloc remonte
 	# fall_timer.start()
 
+##	
 func load_level(_level: PackedScene) -> void:
 	var lv := _level.instance()
+	# level size
 	height = lv.level_height
 	width = lv.level_width
 	board = make_2d_array(height, width)
 
+	# level cell colours
+	Params.available_colors.clear()
+	for c in lv.available_colors.keys():
+		Params.available_colors[c] = lv.available_colors[c]
+
+	# exisiting level cells
 	var tm : TileMap = lv.get_node("TileMap")
 	for pos in tm.get_used_cells():
 		var new_cell = cell_scene.instance()
@@ -326,3 +332,4 @@ func load_level(_level: PackedScene) -> void:
 			3: board[pos.y][pos.x].choose_color("green")
 			4: board[pos.y][pos.x].choose_color("red")
 		
+	
